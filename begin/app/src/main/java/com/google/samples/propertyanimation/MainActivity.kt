@@ -16,10 +16,12 @@
 
 package com.google.samples.propertyanimation
 
-import androidx.appcompat.app.AppCompatActivity
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +37,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+
+
 
         star = findViewById(R.id.star)
         rotateButton = findViewById<Button>(R.id.rotateButton)
@@ -70,6 +76,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun rotater() {
+
+        val animator = ObjectAnimator.ofFloat(star, View.ROTATION, -360f,0f)
+        animator.duration = 1000
+        animator.start()
     }
 
     private fun translater() {
@@ -87,4 +97,5 @@ class MainActivity : AppCompatActivity() {
     private fun shower() {
     }
 
+    
 }
