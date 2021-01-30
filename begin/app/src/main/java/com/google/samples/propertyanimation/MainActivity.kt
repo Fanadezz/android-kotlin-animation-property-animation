@@ -16,12 +16,16 @@
 
 package com.google.samples.propertyanimation
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.addListener
+import androidx.dynamicanimation.animation.DynamicAnimation
 
 
 class MainActivity : AppCompatActivity() {
@@ -75,15 +79,48 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private fun rotater() {
 
-        val animator = ObjectAnimator.ofFloat(star, View.ROTATION, -360f,0f)
+        val animator = ObjectAnimator.ofFloat(star, View.ROTATION, -360f, 0f)
+        //set animation duration
         animator.duration = 1000
+
+        //add listener
+        animator.addListener(object : AnimatorListenerAdapter() {
+
+            override fun onAnimationStart(animation: Animator?) {
+                super.onAnimationStart(animation)
+                //disable the button
+                rotateButton.isEnabled = false
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                //enable the button
+                rotateButton.isEnabled = true
+            }
+        })
+
+        //start animation
         animator.start()
     }
 
     private fun translater() {
+
+
+        val animator = ObjectAnimator.ofFloat(translateButton, View.TRANSLATION_X, 200f)
+        animator.duration = 1000
+
+        animator.addListener { anim ->
+            onEnterAnimationComplete()
+        }
+
+        //animator.start() should be the last line
+        animator.start()
     }
+
+
 
     private fun scaler() {
     }
@@ -97,5 +134,5 @@ class MainActivity : AppCompatActivity() {
     private fun shower() {
     }
 
-    
+
 }
