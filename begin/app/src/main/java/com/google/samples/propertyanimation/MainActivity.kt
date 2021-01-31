@@ -16,16 +16,14 @@
 
 package com.google.samples.propertyanimation
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
-import androidx.dynamicanimation.animation.DynamicAnimation
 
 
 class MainActivity : AppCompatActivity() {
@@ -87,20 +85,8 @@ class MainActivity : AppCompatActivity() {
         animator.duration = 1000
 
         //add listener
-        animator.addListener(object : AnimatorListenerAdapter() {
 
-            override fun onAnimationStart(animation: Animator?) {
-                super.onAnimationStart(animation)
-                //disable the button
-                rotateButton.isEnabled = false
-            }
-
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                //enable the button
-                rotateButton.isEnabled = true
-            }
-        })
+        animator.disableViewDuringAnimation(rotateButton)
 
         //start animation
         animator.start()
@@ -109,21 +95,44 @@ class MainActivity : AppCompatActivity() {
     private fun translater() {
 
 
-        val animator = ObjectAnimator.ofFloat(translateButton, View.TRANSLATION_X, 200f)
-        animator.duration = 1000
+        val animator = ObjectAnimator.ofFloat(star, View.TRANSLATION_X, 200f)
 
-        animator.addListener { anim ->
-            onEnterAnimationComplete()
+        animator.apply {
+            duration = 1000
+            repeatCount = 1
+            repeatMode = ObjectAnimator.REVERSE
         }
 
-        //animator.start() should be the last line
+        animator.disableViewDuringAnimation(translateButton)
         animator.start()
-    }
 
+    }
 
 
     private fun scaler() {
-    }
+
+        //holds properties to be animated and the start and end values
+        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 4f)
+        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 4f)
+
+        /*connect PropertyValuesHolder objects together with
+         ObjectAnimator to associate the target object with the
+         property and the values info.*/
+
+        val animator = ObjectAnimator.ofPropertyValuesHolder(star, scaleX, scaleY)
+
+        animator.apply {
+            duration = 1000
+
+            //make the target return to the beginning position
+            repeatCount = 1
+            repeatMode = ObjectAnimator.REVERSE
+
+            //deactivate the button view
+            disableViewDuringAnimation(scaleButton)
+            start() } }
+
+
 
     private fun fader() {
     }
@@ -134,5 +143,12 @@ class MainActivity : AppCompatActivity() {
     private fun shower() {
     }
 
+
+    fun ObjectAnimator.disableViewDuringAnimation(view: View) {
+
+        addListener(onStart = { view.isEnabled = false }, onEnd = { view.isEnabled = true })
+
+
+    }
 
 }
