@@ -18,6 +18,7 @@ package com.google.samples.propertyanimation
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -130,17 +131,42 @@ class MainActivity : AppCompatActivity() {
 
             //deactivate the button view
             disableViewDuringAnimation(scaleButton)
-            start() } }
-
+            start()
+        }
+    }
 
 
     private fun fader() {
+
+        //fade using ALPHA view property
+        val animator =
+                ObjectAnimator.ofFloat(star, View.ALPHA, 0f)
+                        .apply {
+
+                            duration = 1000
+
+                            //reverse the fade
+                            repeatCount = 1
+                            repeatMode = ObjectAnimator.REVERSE
+                            disableViewDuringAnimation(scaleButton)
+                            start()
+                        }
     }
 
     private fun colorizer() {
+
+        val animator = ObjectAnimator.ofArgb(star.parent, "backgroundColor", Color.BLACK, Color.RED).apply {
+            duration = 1000
+            repeatCount = 1
+            repeatMode = ObjectAnimator.REVERSE
+            disableViewDuringAnimation(colorizeButton)
+            start()
+        }
     }
 
     private fun shower() {
+
+        
     }
 
 
