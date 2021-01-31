@@ -16,15 +16,22 @@
 
 package com.google.samples.propertyanimation
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.animation.addListener
+import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        Timber.plant(Timber.DebugTree())
 
 
 
@@ -155,18 +162,93 @@ class MainActivity : AppCompatActivity() {
 
     private fun colorizer() {
 
-        val animator = ObjectAnimator.ofArgb(star.parent, "backgroundColor", Color.BLACK, Color.RED).apply {
-            duration = 1000
-            repeatCount = 1
-            repeatMode = ObjectAnimator.REVERSE
-            disableViewDuringAnimation(colorizeButton)
-            start()
-        }
+        val animator =
+                ObjectAnimator.ofArgb(star.parent, "backgroundColor", Color.BLACK, Color.RED)
+                        .apply {
+                            duration = 1000
+                            repeatCount = 1
+                            repeatMode = ObjectAnimator.REVERSE
+                            disableViewDuringAnimation(colorizeButton)
+                            start()
+                        }
     }
 
     private fun shower() {
+        //create a container
+        val container = star.parent as ViewGroup
 
-        
+
+        //get container dimens
+        val containerW = container.width
+        val containerH = container.height
+
+        //get star dimens
+        var starW = star.width.toFloat()
+        var starH = star.height.toFloat()
+
+
+        //create new star
+
+        val newStar = AppCompatImageView(this)
+
+        //set dimens for new star
+        newStar.layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+
+        //set star drawable
+        newStar.setImageResource(R.drawable.ic_star)
+
+        //add star to the container
+        container.addView(newStar)
+
+
+        //set the size of the star to be a random float btw 0.1 and 1.6 of the default star size
+
+        newStar.scaleX =
+                Math.random()
+                        .toFloat() * 1.6f
+
+        newStar.scaleY = newStar.scaleX
+
+        //change the width and height
+        starW *= newStar.scaleX
+        starH *=newStar.scaleY
+
+        //position the star in between the parent width
+
+        newStar.translationX = Math.random().toFloat() * containerH - starW/2
+
+        //make the star fall objectAnimator
+
+        val mover = ObjectAnimator.ofFloat(newStar,View.TRANSLATION_Y, -starH, containerH +starH)
+
+        //add accelerate interpolator to add gentle motion to the falling star
+
+        mover.interpolator = AccelerateInterpolator(1f)
+
+//create rotator animator rotating the star at a random amount of degrees up to three times
+        val rotator = ObjectAnimator.ofFloat(newStar,View.ROTATION,(Math.random().toFloat()*1080f))
+
+        //maintain a constant speed for the rotation
+
+        rotator.interpolator = LinearInterpolator()
+
+        //create animator set
+        val set = AnimatorSet()
+
+        //make the set play parallel animations
+        set.playTogether(mover,rotator)
+
+        //set the druation to a random number between 500 and 2000 ms
+        set.duration =(500L..2000L).random()
+
+        //add listener to the set
+        set.addListener(onEnd = {container.removeView(newStar)})
+
+        //start animation
+        set.start()
+
+
     }
 
 
